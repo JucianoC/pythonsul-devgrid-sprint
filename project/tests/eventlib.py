@@ -15,7 +15,7 @@ def random_event_dict():
         'fft_img': [round(uniform(-20000.0, 500000.0), 1) for i in range(9)], 
         'power': {'active': randint(200,300), 'appearent': randint(400,500), 'reactive': randint(200,300)}, 
         'peaks': [round(uniform(1000.0, 1100.0), 1) for i in range(10)], 
-        'utc_time': datetime(randint(2000,2100), randint(1,12), randint(1,28), randint(0,24), randint(0,59), randint(0,59)), 
+        'utc_time': datetime(randint(2000,2100), randint(1,12), randint(1,28), randint(0,23), randint(0,59), randint(0,59)), 
         'evt': 2, 
         'wifi_strength': randint(-100, 0), 
         'device_id': randint(10, 90)

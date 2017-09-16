@@ -36,5 +36,5 @@ class ParserTest(unittest.TestCase):
             'peaks': [1041.0, 1051.0, 1058.0, 1051.0, 1049.0, 1047.0, 1054.0, 1059.0, 1057.0, 1060.0], 
             'evt': 2
         }
-        event = EventFactory.get_event(STATIC_EVENT)
+        event = EventFactory.get_event(event_string_from_dict(comparable_dict))
         self.assertDictEqual(event.__dict__, comparable_dict)
