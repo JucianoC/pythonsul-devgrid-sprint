@@ -1,4 +1,5 @@
-from app import db
+from __future__ import absolute_import, unicode_literals
+from project.app import db
 
 class Cluster(db.Model):
     __tablename__ = 'cluster'

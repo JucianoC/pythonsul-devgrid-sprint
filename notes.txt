@@ -1,4 +1,0 @@
-#regex to get groups:
-([a-z]|[A-Z])+( |[a-z]|[A-Z])*\:( |\w|\=|\;|\.|\-|\,|(\d+\:\d+\:\d+))*(?!( |[a-z]|[A-Z])*\:)
-#pegar grupos
-grupos = [val.group() for val in re.finditer(pattern,text)]

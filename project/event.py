@@ -1,9 +1,10 @@
+from __future__ import absolute_import, unicode_literals
+import json
 import re
 from datetime import datetime
 import pytz
-import json
 
-from models import SensorEvent, SensorEventPeaks, SensorEventFFTRE, SensorEventFFTIMG, db
+from project.models import SensorEvent, SensorEventPeaks, SensorEventFFTRE, SensorEventFFTIMG
 
 class Event(object):
     def __init__(self):
@@ -34,7 +35,7 @@ class Event(object):
         instance_dict['utc_time'] = instance_dict['utc_time'].isoformat()
         return json.dumps(instance_dict, separators=(',', ':'))
 
-    def save(self):
+    def save(self, db):
         sensor_event = SensorEvent(
             device_id=self.device_id,
             device_fw=self.device_fw,
