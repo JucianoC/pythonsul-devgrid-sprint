@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import pytz
 
 class Event(object):
     def __init__(self):
@@ -42,8 +43,6 @@ class EventFactory(object):
                 re_result = re.match(EventFactory.REGEX_SUBGROUP, group)
                 head = re_result.group('head')
                 tail = re_result.group('tail')
-                print("head -> ", head)
-                print("tail -> ", tail)
 
                 if head == "device":
                     EventFactory.decode_device(event, tail)
@@ -51,6 +50,29 @@ class EventFactory(object):
                     EventFactory.decode_alarms(event, tail)
                 elif head == "power":
                     EventFactory.decode_power(event, tail)
+                elif head == "line":
+                    EventFactory.decode_line(event, tail)
+                elif head == "peaks":
+                    EventFactory.decode_float_values_in_list(
+                        event.peaks, tail
+                    )
+                elif head == "fft re":
+                    EventFactory.decode_float_values_in_list(
+                        event.fft_re, tail
+                    )
+                elif head == "fft img":
+                    EventFactory.decode_float_values_in_list(
+                        event.fft_img, tail
+                    )
+                elif head == "utc time":
+                    event.utc_time = datetime.strptime(tail, "%Y-%m-%d %H:%M:%S")
+                    event.utc_time.replace(tzinfo=pytz.UTC)
+                elif head == "hz":
+                    event.hz = float(tail)
+                elif head == "wifi strength":
+                    event.wifi_strength = int(tail)
+                elif head == "dummy":
+                    event.dummy = int(tail)
                 
         except:
             raise
@@ -72,17 +94,26 @@ class EventFactory(object):
 
     @classmethod
     def decode_alarms(cls, event, tail_info):
-        alarm_dict = dict()
         data = [value.split('=') for value in tail_info.split('; ')]
         for key, value in data:
-            alarm_dict[key] = value
-        event.alarms.update(alarm_dict)
+            event.alarms[key] = value
 
     @classmethod
     def decode_power(cls, event, tail_info):
-        power_dict = dict()
         data = [value.split('=') for value in tail_info.split('; ')]
         for key, value in data:
-            info = float(re.match(r'(\d|\.)*', value).group(0))
-            power_dict[key] = info
-        event.power.update(power_dict)
+            info = int(re.match(r'\d+', value).group(0))
+            event.power[key] = info
+
+    @classmethod
+    def decode_line(cls, event, tail_info):
+        data = [value.split('=') for value in tail_info.split('; ')]
+        for key, value in data:
+            info = float(re.match(r'(\-|\d|\.|\,)*', value).group(0).replace(',','.'))
+            event.line[key] = info
+
+    @classmethod
+    def decode_float_values_in_list(cls, list_instance, tail_info):
+        for value in tail_info.split('; '):
+            info = float(re.match(r'(\-|\d|\.)*', value).group(0))
+            list_instance.append(info)
