@@ -1,2 +1,2 @@
-from project.app import manager
-manager.run()
+from project.app import app
+app.run()

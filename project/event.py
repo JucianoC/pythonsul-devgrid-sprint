@@ -61,6 +61,7 @@ class Event(object):
         except:
             raise #debug
             db.session.rollback()
+            return None
 
         peaks = [
             SensorEventPeaks(value=value, sensor_event_id=sensor_event.id)
@@ -87,6 +88,7 @@ class Event(object):
         except:
             raise #debug
             db.session.rollback()
+            return None
 
         return sensor_event
 

@@ -3,7 +3,6 @@ flask
 Flask-SQLAlchemy
 pytz
 requests
-Flask-Script
 sklearn
 numpy
 scipy
