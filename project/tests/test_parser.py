@@ -1,16 +1,18 @@
 from __future__ import absolute_import, unicode_literals
 import unittest
 from datetime import datetime
+import pytz
 
 from project.event import EventFactory
-from eventlib import random_event_dict, event_string_from_dict, STATIC_EVENT
+from eventlib import random_event_dict,  STATIC_EVENT
 
 class ParserTest(unittest.TestCase):
 
     def test_single_parser_random(self):
         comparable_dict = random_event_dict()
-        event = EventFactory.get_event(event_string_from_dict(comparable_dict))
-        self.assertDictEqual(event.__dict__, comparable_dict)
+        event = EventFactory.event_from_string(EventFactory.event_string_from_dict(comparable_dict))
+        comparable_event = EventFactory.event_from_dict(comparable_dict)
+        self.assertDictEqual(event.__dict__, comparable_event.__dict__)
 
     def test_single_parser_static(self):
         comparable_dict = {
@@ -23,7 +25,7 @@ class ParserTest(unittest.TestCase):
                 'current': 1.75
             }, 
             'dummy': 2, 
-            'utc_time': datetime(2016, 10, 4, 16, 47, 50), 
+            'utc_time': datetime(2016, 10, 4, 16, 47, 50, tzinfo=pytz.UTC), 
             'device_fw': 16071801, 
             'wifi_strength': -62, 
             'power': {
@@ -36,5 +38,6 @@ class ParserTest(unittest.TestCase):
             'peaks': [1041.0, 1051.0, 1058.0, 1051.0, 1049.0, 1047.0, 1054.0, 1059.0, 1057.0, 1060.0], 
             'evt': 2
         }
-        event = EventFactory.get_event(event_string_from_dict(comparable_dict))
-        self.assertDictEqual(event.__dict__, comparable_dict)
+        event = EventFactory.event_from_string(EventFactory.event_string_from_dict(comparable_dict))
+        comparable_event = EventFactory.event_from_dict(comparable_dict)
+        self.assertDictEqual(event.__dict__, comparable_event.__dict__)

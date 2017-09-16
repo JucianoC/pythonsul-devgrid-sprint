@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 import pytz
+import json
 
 class Event(object):
     def __init__(self):
@@ -26,13 +27,19 @@ class Event(object):
         self.wifi_strength = None
         self.dummy = None
 
+    def to_json(self):
+        instance_dict = self.__dict__.copy()
+        instance_dict['utc_time'] = instance_dict['utc_time'].isoformat()
+        return json.dumps(instance_dict, separators=(',', ':'))
+
 class EventFactory(object):
 
     REGEX_GROUP = r"([a-z]|[A-Z])+( |[a-z]|[A-Z])*\:( |\w|\=|\;|\.|\-|\,|(\d+\:\d+\:\d+))*(?!( |[a-z]|[A-Z])*\:)"
     REGEX_SUBGROUP = r'^(?P<head>\w+|\w+ \w+)\: (?P<tail>.*)'
+    EVENT_STRING = "Device: ID={device_id}; Fw={device_fw}; Evt={evt}; Alarms: CoilRevesed=OFF; Power: Active={active}W; Reactive={reactive}var; Appearent={appearent}VA; Line: Current={current}A; Voltage={voltage}V; Phase={phase}rad; Peaks: {peaks}; FFT Re: {fft_re}; FFT Img: {fft_img}; UTC Time: {utc_time}; hz: {hz}; WiFi Strength: {wifi_strength}; Dummy: {dummy}"
 
     @classmethod
-    def get_event(cls, event_string):
+    def event_from_string(cls, event_string):
         event = Event()
 
         info_groups = [value.group() for value in re.finditer(EventFactory.REGEX_GROUP, event_string)]
@@ -66,7 +73,7 @@ class EventFactory(object):
                     )
                 elif head == "utc time":
                     event.utc_time = datetime.strptime(tail, "%Y-%m-%d %H:%M:%S")
-                    event.utc_time.replace(tzinfo=pytz.UTC)
+                    event.utc_time = event.utc_time.replace(tzinfo=pytz.UTC)
                 elif head == "hz":
                     event.hz = float(tail)
                 elif head == "wifi strength":
@@ -117,3 +124,21 @@ class EventFactory(object):
         for value in tail_info.split('; '):
             info = float(re.match(r'(\-|\d|\.)*', value).group(0))
             list_instance.append(info)
+
+    @classmethod
+    def event_string_from_dict(cls, event_dict):
+        kwargs = event_dict.copy()
+        kwargs['fft_re'] = '; '.join(map(str, kwargs['fft_re']))
+        kwargs.update(kwargs.pop('line'))
+        kwargs['voltage'] = (str(kwargs['voltage'])).replace('.', ',')
+        kwargs.pop('alarms')
+        kwargs['fft_img'] = '; '.join(map(str, kwargs['fft_img']))
+        kwargs.update(kwargs.pop('power'))
+        kwargs['peaks'] = '; '.join(map(str, kwargs['peaks']))
+        kwargs['utc_time'] = kwargs['utc_time'].strftime("%Y-%m-%d %H:%M:%S")
+        
+        return EventFactory.EVENT_STRING.format(**kwargs)
+
+    @classmethod
+    def event_from_dict(cls, event_dict):
+        return EventFactory.event_from_string(EventFactory.event_string_from_dict(event_dict))
