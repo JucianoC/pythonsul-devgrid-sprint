@@ -3,6 +3,8 @@ from datetime import datetime
 import pytz
 import json
 
+from models import SensorEvent, SensorEventPeaks, SensorEventFFTRE, SensorEventFFTIMG, db
+
 class Event(object):
     def __init__(self):
         self.device_id = None
@@ -31,6 +33,51 @@ class Event(object):
         instance_dict = self.__dict__.copy()
         instance_dict['utc_time'] = instance_dict['utc_time'].isoformat()
         return json.dumps(instance_dict, separators=(',', ':'))
+
+    def save(self):
+        sensor_event = SensorEvent(
+            device_id=self.device_id,
+            device_fw=self.device_fw,
+            device_evt=self.evt,
+            alarms=json.dumps(self.alarms),
+            power_active=self.power['active'],
+            power_reactive=self.power['reactive'],
+            power_appearent=self.power['appearent'],
+            line_current=self.line['current'],
+            line_voltage=self.line['voltage'],
+            line_phase=self.line['phase'],
+            utc_time=self.utc_time,
+            hz=self.hz,
+            wifi_strength=self.wifi_strength,
+            dummy=self.dummy,
+            clustered=True
+        )
+
+        db.session.add(sensor_event)
+        db.session.commit()
+
+        peaks = [
+            SensorEventPeaks(value=value, sensor_event_id=sensor_event.id)
+            for value in self.peaks
+        ]
+
+        fft_re = [
+            SensorEventFFTRE(value=value, sensor_event_id=sensor_event.id)
+            for value in self.fft_re
+        ]
+
+        fft_img = [
+            SensorEventFFTIMG(value=value, sensor_event_id=sensor_event.id)
+            for value in self.fft_img
+        ]
+
+        db.session.add_all(peaks)
+        db.session.add_all(fft_re)
+        db.session.add_all(fft_img)
+        sensor_event.clustered = False
+        db.session.commit()
+
+        return sensor_event
 
 class EventFactory(object):
 
@@ -82,7 +129,6 @@ class EventFactory(object):
                     event.dummy = int(tail)
                 
         except:
-            raise
             return None
         
         return event
@@ -128,14 +174,14 @@ class EventFactory(object):
     @classmethod
     def event_string_from_dict(cls, event_dict):
         kwargs = event_dict.copy()
-        kwargs['fft_re'] = '; '.join(map(str, kwargs['fft_re']))
+        kwargs['fft_re'] = '; '.join(map("{:.2f}".format, kwargs['fft_re']))
         kwargs.update(kwargs.pop('line'))
-        kwargs['voltage'] = (str(kwargs['voltage'])).replace('.', ',')
+        kwargs['phase'] = (str(kwargs['phase'])).replace('.', ',')
         kwargs.pop('alarms')
-        kwargs['fft_img'] = '; '.join(map(str, kwargs['fft_img']))
+        kwargs['fft_img'] = '; '.join(map("{:.2f}".format, kwargs['fft_img']))
         kwargs.update(kwargs.pop('power'))
-        kwargs['peaks'] = '; '.join(map(str, kwargs['peaks']))
-        kwargs['utc_time'] = kwargs['utc_time'].strftime("%Y-%m-%d %H:%M:%S")
+        kwargs['peaks'] = '; '.join(map("{:.3f}".format, kwargs['peaks']))
+        kwargs['utc_time'] = kwargs['utc_time'].strftime("%Y-%m-%-d %H:%M:%S")
         
         return EventFactory.EVENT_STRING.format(**kwargs)
 

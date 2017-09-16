@@ -1,5 +1,5 @@
 celery
 flask
-mysqlclient
 Flask-SQLAlchemy
 pytz
+requests
