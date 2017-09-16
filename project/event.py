@@ -55,7 +55,12 @@ class Event(object):
         )
 
         db.session.add(sensor_event)
-        db.session.commit()
+        
+        try:
+            db.session.commit()
+        except:
+            raise #debug
+            db.session.rollback()
 
         peaks = [
             SensorEventPeaks(value=value, sensor_event_id=sensor_event.id)
@@ -76,7 +81,12 @@ class Event(object):
         db.session.add_all(fft_re)
         db.session.add_all(fft_img)
         sensor_event.clustered = False
-        db.session.commit()
+        
+        try:
+            db.session.commit()
+        except:
+            raise #debug
+            db.session.rollback()
 
         return sensor_event
 
