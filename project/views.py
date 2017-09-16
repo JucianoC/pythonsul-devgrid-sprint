@@ -12,4 +12,4 @@ def receiver():
 def save(event_string):
     from project.event import EventFactory
     event = EventFactory.event_from_string(event_string)
-    event.save(db)
+    return event.save(db)

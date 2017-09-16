@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 
 from project.event import EventFactory
-from eventlib import random_event_dict,  STATIC_EVENT
+from eventlib import random_event_dict, STATIC_EVENT
 
 class ParserTest(unittest.TestCase):
 
