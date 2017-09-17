@@ -22,23 +22,24 @@ After that do this:
 3. Install the python libraries:
     ```
     pip install -r requirements.txt
-    ``
+    ```
 4. Configure the connection with the MySQL in project/config.py
-5. Now you can run the flask app:
+5. Run the database_structure_mysql.sql in your database, to create the structure necessary.
+6. Now you can run the flask app:
     ```
     export FLASK_APP=project/app.py
     flask run
     ```
-6. Now in a different terminal in the same directory and virtual environment, start the Celery:
+7. Now in a different terminal in the same directory and virtual environment, start the Celery:
     ```
     celery -A project.app.celery worker --loglevel=info
     ```
-7. In the repository folder (running your virtual environment) run the following commands to start the service that run the clustering algorithm periodically.
+8. In the repository folder (running your virtual environment) run the following commands to start the service that run the clustering algorithm periodically.
     ```
     export FLASK_APP=project/app.py
     flask start_cluster
     ```
-8. This three services (Flask, Cluster and Celery) must be running.
+9. This three services (Flask, Cluster and Celery) must be running.
 
 After that the flask are enabled to receive the messages by POST, in http://localhost:5000/receiver by default.
 
