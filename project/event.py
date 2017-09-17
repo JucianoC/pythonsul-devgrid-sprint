@@ -68,7 +68,6 @@ class Event(object):
         try:
             db.session.commit()
         except:
-            raise #debug
             db.session.rollback()
             return None
 
@@ -95,7 +94,6 @@ class Event(object):
         try:
             db.session.commit()
         except:
-            raise #debug
             db.session.rollback()
             return None
 
