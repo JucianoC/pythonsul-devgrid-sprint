@@ -44,3 +44,5 @@ After that do this:
 After that the flask are enabled to receive the messages by POST, in http://localhost:5000/receiver by default.
 
 When the number of unclustered events brings 1000 the cluster service collect them and apply the algorithm, a report of the clusters already executed can be viewed at http://localhost:5000/report.
+
+Read the documentation in the sources for more details.
