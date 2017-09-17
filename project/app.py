@@ -2,7 +2,7 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from project.flask_celery import make_celery
-from threading import Thread
+import click
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -11,6 +11,8 @@ db = SQLAlchemy(app)
 
 from project.views import *
 
-from project.cluster import ClusterFactory
-cluster = ClusterFactory(db)
-Thread(target=cluster.run).start()
+@app.cli.command('start_cluster', with_appcontext=True)
+def start_cluster():
+    """Initialize the cluster service."""
+    from project.cluster import ClusterFactory
+    ClusterFactory(db).run()

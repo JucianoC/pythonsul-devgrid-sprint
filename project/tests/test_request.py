@@ -5,10 +5,10 @@ import requests
 from project.event import EventFactory
 from eventlib import random_event_dict, STATIC_EVENT
 
-SLOW_TESTS_ACTIVE = False
+SLOW_TESTS_ACTIVE = True
 
 BASE_URL = "http://localhost:5000/"
-MANY_REQUESTS_RANGE = 500
+MANY_REQUESTS_RANGE = 2000
 
 class RequestTest(unittest.TestCase):
 

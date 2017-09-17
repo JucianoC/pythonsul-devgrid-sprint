@@ -32,7 +32,13 @@ class ClusterFactoryTest(unittest.TestCase):
         data = cluster.get_cluster_data(database_data)
         self.assertIsInstance(data, list)
 
-    def test_iteration(self):
+    def test_do_cluster(self):
         cluster = ClusterFactory(db)
-        cluster.iteration()
+        database_data = cluster.get_database_data()
+        data = cluster.get_cluster_data(database_data)
+        if len(data) >= 1000:
+            try:
+                labels = cluster.do_cluster(data)
+            except ValueError:
+                cluster.ignore_wrong(database_data)
         self.assertEqual(True, True)
