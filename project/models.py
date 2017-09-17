@@ -2,11 +2,17 @@ from __future__ import absolute_import, unicode_literals
 from project.app import db
 
 class Cluster(db.Model):
+    """
+    Map the cluster table in database
+    """
     __tablename__ = 'cluster'
     id = db.Column(db.Integer, primary_key=True)
     event = db.relationship('SensorEvent', lazy='select')
 
 class SensorEvent(db.Model):
+    """
+    Map the sensor_event table in database
+    """
     __tablename__ = 'sensor_event'
     id = db.Column(db.Integer, primary_key=True)
     clustered = db.Column(db.Boolean, default=False)
@@ -31,18 +37,27 @@ class SensorEvent(db.Model):
     dummy = db.Column(db.Integer)
 
 class SensorEventPeaks(db.Model):
+    """
+    Map the sensor_event_peaks table in database
+    """
     __tablename__ = 'sensor_event_peaks'
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Float)
     sensor_event_id = db.Column(db.Integer, db.ForeignKey('sensor_event.id'))
 
 class SensorEventFFTRE(db.Model):
+    """
+    Map the sensor_event_fft_re table in database
+    """
     __tablename__ = 'sensor_event_fft_re'
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Float)
     sensor_event_id = db.Column(db.Integer, db.ForeignKey('sensor_event.id'))
 
 class SensorEventFFTIMG(db.Model):
+    """
+    Map the sensor_event_fft_img table in database
+    """
     __tablename__ = 'sensor_event_fft_img'
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Float)

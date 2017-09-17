@@ -7,6 +7,9 @@ import pytz
 from project.models import SensorEvent, SensorEventPeaks, SensorEventFFTRE, SensorEventFFTIMG
 
 class Event(object):
+    """
+    This class map a event string to this object
+    """
     def __init__(self):
         self.device_id = None
         self.device_fw = None
@@ -31,11 +34,17 @@ class Event(object):
         self.dummy = None
 
     def to_json(self):
+        """
+        Return a json representation of the object
+        """
         instance_dict = self.__dict__.copy()
         instance_dict['utc_time'] = instance_dict['utc_time'].isoformat()
         return json.dumps(instance_dict, separators=(',', ':'))
 
     def save(self, db):
+        """
+        Save in the database the event
+        """
         sensor_event = SensorEvent(
             device_id=self.device_id,
             device_fw=self.device_fw,
@@ -93,6 +102,9 @@ class Event(object):
         return sensor_event
 
 class EventFactory(object):
+    """
+    This class is a Event factory
+    """
 
     REGEX_GROUP = r"([a-z]|[A-Z])+( |[a-z]|[A-Z])*\:( |\w|\=|\;|\.|\-|\,|(\d+\:\d+\:\d+))*(?!( |[a-z]|[A-Z])*\:)"
     REGEX_SUBGROUP = r'^(?P<head>\w+|\w+ \w+)\: (?P<tail>.*)'
@@ -100,6 +112,9 @@ class EventFactory(object):
 
     @classmethod
     def event_from_string(cls, event_string):
+        """
+        Return a Event object from an event string
+        """
         event = Event()
 
         info_groups = [value.group() for value in re.finditer(EventFactory.REGEX_GROUP, event_string)]
@@ -148,6 +163,9 @@ class EventFactory(object):
 
     @classmethod
     def decode_device(cls, event, tail_info):
+        """
+        Decode the device information
+        """
         data = [value.split('=') for value in tail_info.split('; ')]
         data = [(key, int(value)) for key, value in data]
         for key, value in data:
@@ -160,12 +178,18 @@ class EventFactory(object):
 
     @classmethod
     def decode_alarms(cls, event, tail_info):
+        """
+        Decode the alarms information
+        """
         data = [value.split('=') for value in tail_info.split('; ')]
         for key, value in data:
             event.alarms[key] = value
 
     @classmethod
     def decode_power(cls, event, tail_info):
+        """
+        Decode the power information
+        """
         data = [value.split('=') for value in tail_info.split('; ')]
         for key, value in data:
             info = int(re.match(r'\d+', value).group(0))
@@ -173,6 +197,9 @@ class EventFactory(object):
 
     @classmethod
     def decode_line(cls, event, tail_info):
+        """
+        Decode the line information
+        """
         data = [value.split('=') for value in tail_info.split('; ')]
         for key, value in data:
             info = float(re.match(r'(\-|\d|\.|\,)*', value).group(0).replace(',','.'))
@@ -180,12 +207,18 @@ class EventFactory(object):
 
     @classmethod
     def decode_float_values_in_list(cls, list_instance, tail_info):
+        """
+        Decode the tail info to a list of floats
+        """
         for value in tail_info.split('; '):
             info = float(re.match(r'(\-|\d|\.)*', value).group(0))
             list_instance.append(info)
 
     @classmethod
     def event_string_from_dict(cls, event_dict):
+        """
+        Return a event string from a Event
+        """
         kwargs = event_dict.copy()
         kwargs['fft_re'] = '; '.join(map("{:.2f}".format, kwargs['fft_re']))
         kwargs.update(kwargs.pop('line'))
@@ -200,4 +233,7 @@ class EventFactory(object):
 
     @classmethod
     def event_from_dict(cls, event_dict):
+        """
+        Return a Event from a event dict
+        """
         return EventFactory.event_from_string(EventFactory.event_string_from_dict(event_dict))

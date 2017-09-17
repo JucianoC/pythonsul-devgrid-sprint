@@ -7,6 +7,9 @@ from project.event import EventFactory
 from eventlib import random_event_dict, STATIC_EVENT
 
 class ParserTest(unittest.TestCase):
+    """
+    That class are responsable to teste the parser of a string event to dict
+    """
 
     def test_single_parser_random(self):
         comparable_dict = random_event_dict()

@@ -11,6 +11,9 @@ BASE_URL = "http://localhost:5000/"
 MANY_REQUESTS_RANGE = 5000
 
 class RequestTest(unittest.TestCase):
+    """
+    That class are responsable to test the requests to flask
+    """
 
     def test_single_request_static(self):
         response = requests.post(BASE_URL+'receiver', data=STATIC_EVENT)

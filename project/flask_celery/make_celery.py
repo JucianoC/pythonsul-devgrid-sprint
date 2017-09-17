@@ -2,6 +2,9 @@ from __future__ import absolute_import, unicode_literals
 from celery import Celery
 
 def make_celery(app):
+    """
+    That function create the celery instance.
+    """
     celery = Celery(app.import_name
                     # , backend=app.config['CELERY_BACKEND']
                     ,broker=app.config['CELERY_BROKER_URL']

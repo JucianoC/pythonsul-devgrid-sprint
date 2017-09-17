@@ -6,12 +6,18 @@ import numpy
 
 @app.route('/receiver', methods=['POST'])
 def receiver():
+    """
+    This view is responsable to receive the event strings
+    """
     event_string = str(request.data)
     save.delay(event_string)
     return jsonify({'success': True}), 200
 
 @app.route('/report', methods=['GET'])
 def report():
+    """
+    This view is responsable to present a report about the clustered information.
+    """
     database_data = db.session.query(Cluster).all()
     clusters = [
         dict(
@@ -24,6 +30,9 @@ def report():
 
 @celery.task(name='project.save')
 def save(event_string):
+    """
+    This task parse and save the event strin in the database
+    """
     from project.event import EventFactory
     event = EventFactory.event_from_string(event_string)
     return event.save(db)

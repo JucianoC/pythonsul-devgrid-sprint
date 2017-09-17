@@ -6,6 +6,9 @@ from project.cluster import ClusterFactory
 from project.models import SensorEvent
 
 class ClusterFactoryTest(unittest.TestCase):
+    """
+    That class is responsible to test the cluster.
+    """
 
     def test_number_to_cluster(self):
         cluster = ClusterFactory(db)
