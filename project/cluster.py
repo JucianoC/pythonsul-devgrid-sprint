@@ -75,6 +75,7 @@ class ClusterFactory(object):
     def iteration(self):
         if not self.has_data_enougth():
             time.sleep(self.sleep_time)
+            self.db.session.commit()
             return None
         
         database_data = self.get_database_data()
@@ -91,7 +92,7 @@ class ClusterFactory(object):
     def run(self):
         while True:
             result = self.iteration()          
-            if result:
+            if not result is None:
                 print("New cluster -> ", result.id)
             else:
                 print("No enougth data")
